@@ -100,10 +100,9 @@ changeLoop1:
 		loop 	changeLoop1
 		jmp 	afterLoop1
 
-U2_1:
+U2_1: 						; int to U2
 
 		neg 	ax
-		add 	ax, 1
 		jmp 	afterAfterLoop1
 
 
@@ -113,7 +112,10 @@ afterLoop1:
 		je 		U2_1
 
 afterAfterLoop1:
-
+		
+		call 	checkLimit
+		cmp 	bl, 1
+		je  	blad1
 		mov 	liczba1, ax
 
 afterError:
@@ -206,14 +208,13 @@ changeLoop2:
 		je 		tmp2
 		mov 	dx, MUL_CONST
 		mul 	dx
-		add 	ah, bh
+		add 	ax, bx
 		loop 	changeLoop2
 		jmp 	afterLoop2
 
 U2_2:
 
 		neg 	ax
-		add 	ax, 1
 		jmp 	afterAfterLoop2
 
 afterLoop2:
@@ -222,17 +223,33 @@ afterLoop2:
 		je 		U2_2
 
 afterAfterLoop2:
-
+		
+		call 	checkLimit
+		cmp 	bl, 1
+		je 		blad2
+		mov 	NEGATIVE, 0 
 		mov 	liczba2, ax
 
 		mov 	bx, liczba1
 
 		add 	ax, bx
+		js 		signedPrint
 
+signedPrint:
+
+		neg 	ax
+		jmp 	postCheck
+
+noOverflow:
+
+
+
+postCheck:
 		mov 	suma, ax
 		mov 	bx, MUL_CONST
 		xor 	dx, dx
 		xor 	cx, cx
+
 
 preStringPrint:
 
@@ -262,17 +279,47 @@ koniec:
 		mov 	ah, 4Ch
 		int 	21h
 
+checkLimit PROC
+startCheckUpper:
+		
+		cmp 	NEGATIVE, 1
+		jne 	posCheck
+
+negCheck:
+		mov 	bx, DOWN_LIM
+		cmp 	ax, bx
+		jbe 	Error
+		jmp 	Pass
+posCheck:
+		mov 	bx, UP_LIM
+		cmp 	ax, bx
+		ja	 	Error
+Pass:
+		mov 	bl, 0 	; 1 if error
+		ret
+Error:
+		mov 	bl, 1	; 0 if success
+		ret 
+checkLimit ENDP
+
+
+		
 
 
 
 ;		DANE 
 
+
+		UP_LIM 				EQU 32767
+		DOWN_LIM 			EQU 32768
 		INPUT_STR			EQU 0Ah
-		NEW_LINE 			DB 	13,10,"$"
+		NEW_LINE 			DB 	CR,LF,"$"
 		PRINT_STR			EQU 09h
 		PRINT_CHR			EQU 02h
 		INPUT_LEN			EQU 7
 		MUL_CONST			EQU 0Ah
+		CR 					EQU 0Dh
+		LF 					EQU 0Ah
 
 		NEGATIVE 			DB 	(?)
 
@@ -290,9 +337,9 @@ koniec:
 
 		temp				DB 	(?)
 
-		napisPierwszy 		DB 	"Podaj pierwsza liczbe: ",13,10,"$"
-		napisDrugi	 		DB 	"Podaj druga liczbe: ",13,10,"$"
-		errMsg 				DB 	"Niepoprawne dane",13,10,"$"
+		napisPierwszy 		DB 	"Podaj pierwsza liczbe: ",CR,LF,"$"
+		napisDrugi	 		DB 	"Podaj druga liczbe: ",CR,LF,"$"
+		errMsg 				DB 	"Niepoprawne dane",CR,LF,"$"
 
 
 		END 	Start
