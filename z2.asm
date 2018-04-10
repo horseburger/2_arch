@@ -221,9 +221,9 @@ changeLoop2:
 		je 		tmp2
 		mov 	dx, MUL_CONST
 		mul 	dx
-		jc    blad2
+		jc    	blad2
 		add 	ax, bx
-		jc    blad2
+		jc    	blad2
 		loop 	changeLoop2
 		jmp 	afterLoop2
 
