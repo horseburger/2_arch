@@ -111,15 +111,15 @@ U2_1: 						; int to U2
 
 afterLoop1:
 
+		call 	checkLimit
+		cmp 	bl, 1
+		je 		blad1
 		cmp 	NEGATIVE, 1
 		je 		U2_1
 
 afterAfterLoop1:
 
 		int 	3h		
-		call 	checkLimit
-		cmp 	bl, 1
-		je  	blad1
 		mov 	liczba1, ax
 
 afterError:
@@ -229,15 +229,15 @@ U2_2:
 
 afterLoop2:
 
+		call 	checkLimit
+		cmp 	bl, 1
+		je 		blad2
 		cmp 	NEGATIVE, 1
 		je 		U2_2
 
 afterAfterLoop2:
 		
 		int 	3h
-		call 	checkLimit
-		cmp 	bl, 1
-		je 		blad2
 		mov 	NEGATIVE, 0 
 
 		mov 	liczba2, ax
