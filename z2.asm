@@ -98,8 +98,11 @@ changeLoop1:
 		je 		tmp1
 		mov 	dx, MUL_CONST
 		mul 	dx
+		jc 		blad1
 		xor 	bh, bh
 		add 	ax, bx
+		jc		blad1
+		
 		loop 	changeLoop1
 		jmp 	afterLoop1
 
@@ -218,7 +221,9 @@ changeLoop2:
 		je 		tmp2
 		mov 	dx, MUL_CONST
 		mul 	dx
+		jc    blad2
 		add 	ax, bx
+		jc    blad2
 		loop 	changeLoop2
 		jmp 	afterLoop2
 
