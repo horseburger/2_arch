@@ -1,7 +1,5 @@
 		.MODEL TINY
 
-
-
 .CODE
 
 		ORG 	100h
@@ -26,6 +24,8 @@ Start:
 		mov 	temp, cl
 		xor		ch, ch
 		mov 	si, OFFSET pLiczbaDane
+		cmp 	cl, 1
+		je 		errHandle1
 		mov 	al, [si]
 		cmp 	al, '0'
 		je 		blad1
@@ -39,6 +39,9 @@ minus1:
 		dec 	cl
 		mov 	temp, cl
 		inc 	si
+		mov 	al, [si]
+		cmp 	al, '0'
+		je 		blad1
 
 errHandle1:
 
@@ -112,7 +115,8 @@ afterLoop1:
 		je 		U2_1
 
 afterAfterLoop1:
-		
+
+		int 	3h		
 		call 	checkLimit
 		cmp 	bl, 1
 		je  	blad1
@@ -139,6 +143,8 @@ afterError:
 		mov 	temp, cl
 		xor		ch, ch
 		mov 	si, OFFSET dLiczbaDane
+		cmp 	cl, 1
+		je 		errHandle2
 		mov 	al, [si]
 		cmp 	al, '0'
 		je 		blad2
@@ -152,6 +158,10 @@ minus2:
 		dec 	cl
 		mov 	temp, cl
 		inc 	si
+		mov 	al, [si]
+		cmp 	al, '0'
+
+
 
 errHandle2:
 
@@ -224,32 +234,46 @@ afterLoop2:
 
 afterAfterLoop2:
 		
+		int 	3h
 		call 	checkLimit
 		cmp 	bl, 1
 		je 		blad2
 		mov 	NEGATIVE, 0 
-		mov 	liczba2, ax
 
+		mov 	liczba2, ax
 		mov 	bx, liczba1
 
+		int 	3h
+
+		xor 	dx, dx
 		add 	ax, bx
-		js 		signedPrint
+		jno 	postCheck
+		js 		plusOverflow
+		mov 	dx, 0FFFFh
+		jmp 	almostThere
 
-signedPrint:
+plusOverflow:
 
-		neg 	ax
-		jmp 	postCheck
-
-noOverflow:
-
-
+		xor 	dx, dx
+		jmp 	almostThere
 
 postCheck:
-		mov 	suma, ax
-		mov 	bx, MUL_CONST
-		xor 	dx, dx
-		xor 	cx, cx
 
+		jns 	almostThere
+		mov 	dx, 0FFFFh
+
+almostThere:
+		
+		mov 	bx, MUL_CONST
+		xor 	cx, cx
+		or 		dx, dx
+		jns 	preStringPrint
+		neg 	ax
+		jnc 	noCarryFlag
+		add 	dx, 1
+noCarryFlag:
+		neg 	dx
+		mov 	NEGATIVE, 1 
 
 preStringPrint:
 
@@ -259,6 +283,18 @@ preStringPrint:
 		inc 	cx
 		cmp		ax, 0
 		jne		preStringPrint
+
+		cmp 	NEGATIVE, 1
+		je  	printMinus
+		jmp 	notPrintMinus
+
+printMinus:
+		
+		mov 	dl, '-'
+		mov 	ah, 02h
+		int 	21h
+
+notPrintMinus:
 
 		mov 	ah, 02h
 
@@ -272,7 +308,13 @@ stringPrint:
 		dec 	cx
 		jmp 	stringPrint
 
-
+itsOnlyZero:
+	
+		xor 	dx, dx
+		mov 	dx, ax
+		add 	dx, 30h
+		mov 	ah, PRINT_CHR
+		int 	21h
 
 koniec:
 
@@ -288,7 +330,7 @@ startCheckUpper:
 negCheck:
 		mov 	bx, DOWN_LIM
 		cmp 	ax, bx
-		jbe 	Error
+		jb 	 	Error
 		jmp 	Pass
 posCheck:
 		mov 	bx, UP_LIM
@@ -303,7 +345,7 @@ Error:
 checkLimit ENDP
 
 
-		
+
 
 
 
