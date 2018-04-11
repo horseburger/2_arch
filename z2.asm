@@ -163,6 +163,7 @@ minus2:
 		inc 	si
 		mov 	al, [si]
 		cmp 	al, '0'
+		je 		blad2
 
 
 
@@ -335,7 +336,7 @@ startCheckUpper:
 negCheck:
 		mov 	bx, DOWN_LIM
 		cmp 	ax, bx
-		jb 	 	Error
+		ja 	 	Error
 		jmp 	Pass
 posCheck:
 		mov 	bx, UP_LIM
